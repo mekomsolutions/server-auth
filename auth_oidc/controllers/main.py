@@ -14,7 +14,7 @@ from odoo import http
 from odoo.http import request
 
 from odoo.addons.auth_oauth.controllers.main import OAuthLogin
-from odoo.addons.web.controllers.main import Session
+from odoo.addons.web.controllers.session import Session
 
 _logger = logging.getLogger(__name__)
 
@@ -73,6 +73,7 @@ class OpenIDLogout(Session):
                 params["client_id"] = provider.client_id
                 params["post_logout_redirect_uri"] = redirect_url
                 logout_url = components._replace(query=url_encode(params)).geturl()
-                return super().logout(redirect=logout_url)
+                request.session.logout(keep_db=True)
+                return request.redirect(location=logout_url, local=False)
         # User has no account with any provider or no logout URL is configured for the provider
         return super().logout(redirect=redirect)
