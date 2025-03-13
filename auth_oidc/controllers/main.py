@@ -74,6 +74,7 @@ class OpenIDLogout(Session):
                 params["post_logout_redirect_uri"] = redirect_url
                 logout_url = components._replace(query=url_encode(params)).geturl()
                 request.session.logout(keep_db=True)
-                return request.redirect(location=logout_url, local=False)
-        # User has no account with any provider or no logout URL is configured for the provider
+                return request.redirect(logout_url, local=False)
+        # User has no account with any provider
+        # or no logout URL is configured for the provider
         return super().logout(redirect=redirect)

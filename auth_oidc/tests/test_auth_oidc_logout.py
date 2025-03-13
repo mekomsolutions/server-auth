@@ -3,6 +3,7 @@
 
 import contextlib
 import logging
+from unittest.mock import Mock
 from urllib.parse import parse_qsl, urljoin, urlparse
 
 from werkzeug.urls import url_encode
@@ -61,7 +62,9 @@ class TestOpenIDLogout(common.HttpCase):
             self.assertEqual(LOGIN_PATH, resp.location)
 
     def test_skip_oidc_logout_for_all_users(self):
-        """Test that oidc logout is skipped for all users if provider has no logout url"""
+        """
+        Test that oidc logout is skipped for all users if provider has no logout url
+        """
         self.assertFalse(self.provider.end_session_endpoint)
         user = self._prepare_login_test_user(self.provider)
         with create_request(self.env, user.id, self.mock_logout_user):
@@ -72,7 +75,11 @@ class TestOpenIDLogout(common.HttpCase):
         """Test that oidc logout"""
         self._set_test_oidc_logout_url(urljoin(OIDC_BASE_LOGOUT_URL, OIDC_LOGOUT_PATH))
         user = self._prepare_login_test_user(self.provider)
-        with create_request(self.env, user.id, self.mock_logout_user):
+        mock_session = Mock()
+        with MockRequest(self.env) as request:
+            request.httprequest.url_root = BASE_URL + "/"
+            request.session = mock_session
+            mock_session.uid = user.id
             resp = OpenIDLogout().logout()
             self.assertTrue(resp.location.startswith(OIDC_BASE_LOGOUT_URL))
             actual_components = urlparse(resp.location)
@@ -82,13 +89,12 @@ class TestOpenIDLogout(common.HttpCase):
             self.assertEqual(
                 urljoin(BASE_URL, LOGIN_PATH), actual_params["post_logout_redirect_uri"]
             )
+            mock_session.logout.assert_called_once_with(keep_db=True)
 
     def test_oidc_logout_with_params(self):
         """Test that params both in the logout and redirect urls are preserved"""
         logout_url_params = {"param_1": 1, "param_2": 2}
-        oidc_logout_path = "{}?{}".format(
-            OIDC_LOGOUT_PATH, url_encode(logout_url_params)
-        )
+        oidc_logout_path = f"{OIDC_LOGOUT_PATH}?{url_encode(logout_url_params)}"
         logout_url = urljoin(OIDC_BASE_LOGOUT_URL, oidc_logout_path)
         self._set_test_oidc_logout_url(logout_url)
         user = self._prepare_login_test_user(self.provider)
