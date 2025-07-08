@@ -28,9 +28,8 @@ class OAuthAutoLogin(OAuthLogin):
     @http.route("/web/login", type="http", auth="none")
     def web_login(self, *args, **kw):
         if not request.session.uid:
-            if not request.params or not request.params.get("oauth_error"):
-                auth_link = self.auto_login_link()
-                if auth_link:
-                    return request.redirect(auth_link, local=False)
+            auth_link = self.auto_login_link()
+            if auth_link:
+                return request.redirect(auth_link, local=False)
 
         return super().web_login(*args, **kw)
