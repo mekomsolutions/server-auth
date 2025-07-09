@@ -76,7 +76,7 @@ class TestOauthAutoLogin(common.HttpCase):
         providers = [provider]
         with MockRequest(self.env) as request, patch.object(
             instance, "list_providers", return_value=providers
-        ) as mock_list_providers:
+        ):
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL
@@ -94,7 +94,7 @@ class TestOauthAutoLogin(common.HttpCase):
         providers = [provider]
         with MockRequest(self.env) as request, patch.object(
             instance, "list_providers", return_value=providers
-        ) as mock_list_providers:
+        ):
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL
@@ -117,7 +117,7 @@ class TestOauthAutoLogin(common.HttpCase):
         providers = [provider_1, provider_2]
         with MockRequest(self.env) as request, patch.object(
             instance, "list_providers", return_value=providers
-        ) as mock_list_providers:
+        ):
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL
