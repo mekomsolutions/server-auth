@@ -3,6 +3,7 @@
 
 from urllib.parse import parse_qsl, urlparse
 
+from odoo import http
 from odoo.http import request
 
 from odoo.addons.auth_oauth.controllers.main import OAuthLogin
@@ -19,6 +20,7 @@ class OAuthAutoLogin(OAuthLogin):
         if len(providers) == 1:
             return providers[0].get("auth_link")
 
+    @http.route("/web/login", type="http", auth="none")
     def web_login(self, *args, **kw):
         if not request.session.uid:
             if not self._autologin_disabled(request.httprequest.url):
