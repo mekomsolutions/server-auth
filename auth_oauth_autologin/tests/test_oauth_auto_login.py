@@ -3,6 +3,7 @@
 
 from unittest.mock import Mock, patch
 
+from odoo.http import Response
 from odoo.tests import common
 
 from odoo.addons.website.tools import MockRequest
@@ -21,55 +22,55 @@ class TestOauthAutoLogin(common.HttpCase):
     def test_skip_auto_login_if_already_logged_in(self, mock_web_login):
         """Test that auto login is skipped if user is logged in"""
         mock_session = Mock()
-        mock_response = Mock()
-        mock_web_login.return_value = mock_response
+        response = Response()
+        mock_web_login.return_value = response
         with MockRequest(self.env) as request:
             request.session = mock_session
-            self.assertEqual(mock_response, OAuthAutoLogin().web_login())
+            self.assertEqual(response, OAuthAutoLogin().web_login())
 
     @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
     def test_skip_auto_login_if_no_autologin_parameter_exists(self, mock_web_login):
         """Test that auto login is skipped if no_autologin parameter exists"""
         mock_session = Mock()
-        mock_response = Mock()
-        mock_web_login.return_value = mock_response
+        response = Response()
+        mock_web_login.return_value = response
         with MockRequest(self.env) as request:
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL + "?no_autologin"
-            self.assertEqual(mock_response, OAuthAutoLogin().web_login())
+            self.assertEqual(response, OAuthAutoLogin().web_login())
 
     @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
     def test_skip_auto_login_if_oauth_error_parameter_exists(self, mock_web_login):
         """Test that auto login is skipped if oauth_error parameter exists"""
         mock_session = Mock()
-        mock_response = Mock()
-        mock_web_login.return_value = mock_response
+        response = Response()
+        mock_web_login.return_value = response
         with MockRequest(self.env) as request:
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL + "?oauth_error=1"
-            self.assertEqual(mock_response, OAuthAutoLogin().web_login())
+            self.assertEqual(response, OAuthAutoLogin().web_login())
 
     @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
     def test_skip_auto_login_if_error_parameter_exists(self, mock_web_login):
         """Test that auto login is skipped if error parameter exists"""
         mock_session = Mock()
-        mock_response = Mock()
-        mock_web_login.return_value = mock_response
+        response = Response()
+        mock_web_login.return_value = response
         with MockRequest(self.env) as request:
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL + "?error=test"
-            self.assertEqual(mock_response, OAuthAutoLogin().web_login())
+            self.assertEqual(response, OAuthAutoLogin().web_login())
 
     @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
     def test_skip_auto_login_if_no_provider_has_autologin_set(self, mock_web_login):
         """Test that auto login is skipped if error parameter exists"""
         instance = OAuthAutoLogin()
         mock_session = Mock()
-        mock_response = Mock()
-        mock_web_login.return_value = mock_response
+        response = Response()
+        mock_web_login.return_value = response
         provider = {}
         provider["autologin"] = False
         provider["auth_link"] = "https://keycloak.test"
@@ -80,15 +81,15 @@ class TestOauthAutoLogin(common.HttpCase):
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL
-            self.assertEqual(mock_response, instance.web_login())
+            self.assertEqual(response, instance.web_login())
 
     @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
     def test_skip_auto_login_if_the_provider_has_no_auth_link(self, mock_web_login):
         """Test that auto login is skipped if error parameter exists"""
         instance = OAuthAutoLogin()
         mock_session = Mock()
-        mock_response = Mock()
-        mock_web_login.return_value = mock_response
+        response = Response()
+        mock_web_login.return_value = response
         provider = {}
         provider["autologin"] = True
         providers = [provider]
@@ -98,15 +99,15 @@ class TestOauthAutoLogin(common.HttpCase):
             request.session = mock_session
             mock_session.uid = False
             request.httprequest.url = LOGIN_URL
-            self.assertEqual(mock_response, instance.web_login())
+            self.assertEqual(response, instance.web_login())
 
     @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
     def test_oauth_auto_login_with_enabled_provider(self, mock_web_login):
         """Test that auto login works if enabled"""
         instance = OAuthAutoLogin()
         mock_session = Mock()
-        mock_response = Mock()
-        mock_web_login.return_value = mock_response
+        response = Response()
+        mock_web_login.return_value = response
         provider_1 = {}
         provider_1["autologin"] = False
         provider_1["auth_link"] = "https://keycloak1.test"
