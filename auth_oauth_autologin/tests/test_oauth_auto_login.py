@@ -19,9 +19,22 @@ class TestOauthAutoLogin(common.HttpCase):
         self.is_local_direct = local
 
     @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
+    def test_skip_auto_login_for_post_request_method(self, mock_web_login):
+        """Test that auto login is skipped if user is logged in"""
+        mock_session = Mock()
+        mock_session.uid = False
+        response = Response()
+        mock_web_login.return_value = response
+        with MockRequest(self.env) as request:
+            request.session = mock_session
+            request.httprequest.method = "POST"
+            self.assertEqual(response, OAuthAutoLogin().web_login())
+
+    @patch("odoo.addons.auth_oauth.controllers.main.OAuthLogin.web_login")
     def test_skip_auto_login_if_already_logged_in(self, mock_web_login):
         """Test that auto login is skipped if user is logged in"""
         mock_session = Mock()
+        mock_session.uid = 1
         response = Response()
         mock_web_login.return_value = response
         with MockRequest(self.env) as request:
